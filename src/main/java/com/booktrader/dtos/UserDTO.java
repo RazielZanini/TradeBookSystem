@@ -1,6 +1,6 @@
 package com.booktrader.dtos;
 
-import java.util.List;
+import com.booktrader.domain.user.UserRole;
 
-public record UserDTO(String name, String password) {
+public record UserDTO(String name, String password, UserRole role) {
 }
