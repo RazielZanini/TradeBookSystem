@@ -18,7 +18,7 @@ public class TokenService {
     private String secret;
 
     public String generateToken(User user){
-        System.out.println("Chave secreta " + secret);
+
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
@@ -26,7 +26,6 @@ public class TokenService {
                     .withSubject(user.getUsername())
                     .withExpiresAt(generateExpirationDate())
                     .sign(algorithm);
-            System.out.println("Token Gerado: " +token);
             return token;
 
         } catch(JWTCreationException exception){
@@ -36,7 +35,6 @@ public class TokenService {
 
     public String validateToken(String token) {
         try{
-            System.out.println("Token recebido" + token);
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
                     .withIssuer("auth-api")
@@ -44,7 +42,6 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch(JWTVerificationException exception){
-            System.out.println("Erro na validação do Token: " + exception.getMessage());
             return "";
         }
     }
