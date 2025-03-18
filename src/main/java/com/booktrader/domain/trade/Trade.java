@@ -20,12 +20,12 @@ public class Trade {
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    @JsonIgnoreProperties({"books", "reviews"})
+    @JsonIgnoreProperties({"books", "reviews", "password", "authorities"})
     private User sender;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    @JsonIgnoreProperties({"books", "reviews"})
+    @JsonIgnoreProperties({"books", "reviews", "password", "authorities"})
     private User receiver;
 
     @ManyToOne
