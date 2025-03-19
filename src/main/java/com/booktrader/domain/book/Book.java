@@ -25,6 +25,7 @@ public class Book {
     private Long id;
     private String title;
     private String author;
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
@@ -43,5 +44,6 @@ public class Book {
         this.author = data.author();
         this.conservStatus = data.conservStatus();
         this.edition = data.edition();
+        this.image = data.image();
     }
 }
