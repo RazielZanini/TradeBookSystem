@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity(name="trades")
 @Table(name="trades")
 @Setter
@@ -29,7 +31,22 @@ public class Trade {
     private User receiver;
 
     @ManyToOne
-    @JoinColumn(name = "tradedBook_id")
+    @JoinColumn(name = "senderBook_id")
     @JsonIgnoreProperties({"owner", "reviews"})
-    private Book tradedBook;
+    private Book senderBook;
+
+    @ManyToOne
+    @JoinColumn(name = "receiverBook_id")
+    @JsonIgnoreProperties({"owner", "reviews"})
+    private Book receiverBook;
+
+    @Enumerated(EnumType.STRING)
+    private TradeStatus status = TradeStatus.PENDING;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
 }

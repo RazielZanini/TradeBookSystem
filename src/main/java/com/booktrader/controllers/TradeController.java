@@ -18,13 +18,13 @@ public class TradeController {
     private TradeService tradeService;
 
     @GetMapping
-    public ResponseEntity<List<Trade>> getAllTrades(){
+    public ResponseEntity<List<Trade>> getAllTrades() {
         List<Trade> trades = this.tradeService.findAllTrades();
         return new ResponseEntity<>(trades, HttpStatus.OK);
     }
 
     @GetMapping("/{tradeId}")
-    public ResponseEntity<Trade> getTradeById(@PathVariable("tradeId")Long tradeId) throws Exception {
+    public ResponseEntity<Trade> getTradeById(@PathVariable("tradeId") Long tradeId) throws Exception {
         Trade trade = this.tradeService.findTradeById(tradeId);
         return new ResponseEntity<>(trade, HttpStatus.OK);
     }
@@ -33,5 +33,15 @@ public class TradeController {
     public ResponseEntity<Trade> createTrade(@RequestBody TradeDTO data) throws Exception {
         Trade newTrade = this.tradeService.createTrade(data);
         return new ResponseEntity<>(newTrade, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{tradeId}/respond")
+    public ResponseEntity<String> respondTrade(@PathVariable Long tradeId, @RequestParam boolean accept) {
+        try{
+            tradeService.respondToTrade(tradeId, accept);
+            return ResponseEntity.ok("Troca " + (accept ? "aceita!":"recusada"));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

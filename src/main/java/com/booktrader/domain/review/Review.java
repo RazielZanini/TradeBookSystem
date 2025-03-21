@@ -33,10 +33,14 @@ public class Review {
 
     private String review;
 
-    private LocalDateTime timeStamp;
+    private LocalDateTime createdAt;
 
     public Review(ReviewDTO data){
         this.review = data.review();
-        this.timeStamp = data.timeStamp();
+    }
+
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
     }
 }

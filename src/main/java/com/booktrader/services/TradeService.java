@@ -1,8 +1,11 @@
 package com.booktrader.services;
 
 import com.booktrader.domain.book.Book;
+import com.booktrader.domain.notification.Notification;
 import com.booktrader.domain.trade.Trade;
+import com.booktrader.domain.trade.TradeStatus;
 import com.booktrader.domain.user.User;
+import com.booktrader.dtos.NotificationDTO;
 import com.booktrader.dtos.TradeDTO;
 import com.booktrader.repositories.TradeRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +26,9 @@ public class TradeService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public Trade findTradeById(Long id) throws Exception{
         return this.tradeRepository.findTradeById(id)
                 .orElseThrow(() -> new Exception("Troca não encontrada"));
@@ -38,32 +44,81 @@ public class TradeService {
 
         User sender = this.userService.findUserById(trade.sender());
         User receiver = this.userService.findUserById(trade.receiver());
-        Book book = this.bookService.findBookById(trade.tradedBook());
+        Book receiverBook = this.bookService.findBookById(trade.receiverBook());
+        Book senderBook = this.bookService.findBookById(trade.senderBook());
 
         if (sender.equals(receiver)) {
             throw new Exception("Não é possível uma troca entre o mesmo usuário.");
         }
 
-        if (!book.getOwner().equals(sender)) {
+        if (!senderBook.getOwner().equals(sender)) {
             throw new Exception("O usuário remetente não possui este livro.");
         }
 
-        book.setOwner(receiver);
-        sender.getBooks().remove(book);
-        receiver.getBooks().add(book);
+        if (!receiverBook.getOwner().equals(receiver)) {
+            throw new Exception("O usuário destinatário não possui este livro.");
+        }
 
-        this.userService.saveUser(sender);
-        this.userService.saveUser(receiver);
-
+        // Cria a troca com status "PENDING"
         Trade newTrade = new Trade();
-        newTrade.setTradedBook(book);
+        newTrade.setSenderBook(senderBook);
+        newTrade.setReceiverBook(receiverBook);
         newTrade.setReceiver(receiver);
         newTrade.setSender(sender);
+        newTrade.setStatus(TradeStatus.PENDING);
+
         this.tradeRepository.save(newTrade);
+
+        notificateUser(sender, receiver, receiverBook, senderBook, newTrade.getId());
 
         return newTrade;
     }
 
+    @Transactional
+    public void respondToTrade(Long tradeId, boolean accept) throws Exception {
+        Trade trade = this.tradeRepository.findTradeById(tradeId)
+                .orElseThrow(() -> new Exception("Troca não encontrada!"));
 
+        if(!trade.getStatus().equals(TradeStatus.PENDING)){
+            throw new Exception("A troca já foi aceita!");
+        }
 
+        if (accept) {
+            // Realiza a troca
+            User sender = trade.getSender();
+            User receiver = trade.getReceiver();
+            Book senderBook = trade.getSenderBook();
+            Book receiverBook = trade.getReceiverBook();
+
+            sender.getBooks().remove(senderBook);
+            sender.getBooks().add(receiverBook);
+            receiver.getBooks().remove(receiverBook);
+            receiver.getBooks().add(senderBook);
+            senderBook.setOwner(receiver);
+            receiverBook.setOwner(sender);
+
+            //Salva as mudanças
+            this.userService.saveUser(sender);
+            this.userService.saveUser(receiver);
+            this.bookService.saveBook(senderBook);
+            this.bookService.saveBook(receiverBook);
+
+            //Atualiza o status para "COMPLETE"
+            trade.setStatus(TradeStatus.COMPLETED);
+            this.tradeRepository.save(trade);
+
+        } else{
+            //Atualiza status para "REJECTED"
+            trade.setStatus(TradeStatus.REJECTED);
+            this.tradeRepository.save(trade);
+        }
+    }
+
+    public void notificateUser(User sender, User receiver, Book userBook, Book tradeBook, Long tradeId) {
+        String message = sender.getName() + " propôs uma troca do seu livro '" + tradeBook.getTitle() +
+                "' por '" + userBook.getTitle() + "'. Você aceita? (ID da troca: " + tradeId + ")";
+
+        Notification notification = new Notification(message, userBook, tradeBook, receiver, tradeId);
+        this.notificationService.saveNotification(notification);
+    }
 }

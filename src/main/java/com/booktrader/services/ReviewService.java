@@ -8,8 +8,6 @@ import com.booktrader.repositories.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 public class ReviewService {
 
@@ -37,7 +35,6 @@ public class ReviewService {
 
         newReview.setWriter(writer);
         newReview.setReview(data.review());
-        newReview.setTimeStamp(LocalDateTime.now());
         newReview.setReviewedBook(reviewedBook);
 
         this.saveReview(newReview);
@@ -54,7 +51,6 @@ public class ReviewService {
                 .orElseThrow(() -> new Exception("Erro ao encontrar review"));
 
         foundReview.setReview(review.review());
-        foundReview.setTimeStamp(review.timeStamp());
 
         this.saveReview(foundReview);
 

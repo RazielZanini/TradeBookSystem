@@ -5,5 +5,5 @@ import com.booktrader.domain.user.User;
 
 import java.time.LocalDateTime;
 
-public record ReviewDTO(String review, LocalDateTime timeStamp, Long writer, Long reviewedBook) {
+public record ReviewDTO(String review, Long writer, Long reviewedBook) {
 }

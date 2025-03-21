@@ -1,5 +1,5 @@
 package com.booktrader.dtos;
 
-public record TradeDTO(Long sender, Long receiver, Long tradedBook) {
+public record TradeDTO(Long sender, Long senderBook, Long receiver, Long receiverBook) {
 
 }
