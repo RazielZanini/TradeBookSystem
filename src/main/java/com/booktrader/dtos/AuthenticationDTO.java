@@ -1,4 +1,4 @@
 package com.booktrader.dtos;
 
-public record AuthenticationDTO(String name, String password) {
+public record AuthenticationDTO(String email, String password) {
 }

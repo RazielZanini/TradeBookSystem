@@ -23,12 +23,6 @@ public class UserService {
         this.repository.save(user);
     }
 
-    public User createUser(UserDTO data){
-        User newUser = new User(data);
-        this.saveUser(newUser);
-        return newUser;
-    }
-
     public List<User> getAllUsers(){
         return this.repository.findAll();
     }

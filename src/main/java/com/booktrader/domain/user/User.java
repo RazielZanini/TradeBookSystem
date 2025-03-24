@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity(name = "users")
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @Getter
 @Setter
 @AllArgsConstructor
@@ -36,16 +36,20 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "writer")
     private List<Review> reviews = new ArrayList<>();
 
+    private String email;
+
     public User(UserDTO data){
         this.name = data.name();
         this.password = data.password();
         this.role = UserRole.USER;
+        this.email = data.email();
     }
 
-    public User(String name, String password, UserRole role){
+    public User(String name, String password, UserRole role, String email){
         this.name = name;
         this.password = password;
         this.role = role;
+        this.email = email;
     }
 
     @Override
