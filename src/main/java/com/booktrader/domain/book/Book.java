@@ -15,7 +15,6 @@ import java.util.List;
 @Table(name="books")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
 public class Book {
@@ -45,5 +44,14 @@ public class Book {
         this.conservStatus = data.conservStatus();
         this.edition = data.edition();
         this.image = data.image();
+    }
+
+    public Book(String title, String author, String image, User owner, int edition, ConservStatus conservStatus){
+        this.title = title;
+        this.author = author;
+        this.image = image;
+        this.owner = owner;
+        this.edition = edition;
+        this.conservStatus = conservStatus;
     }
 }

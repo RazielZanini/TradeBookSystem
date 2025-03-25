@@ -4,12 +4,13 @@ import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.UserDTO;
-import com.booktrader.repositories.BookRepository;
 import com.booktrader.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.springframework.util.Assert.notNull;
 
 @Service
 public class UserService {
@@ -28,6 +29,9 @@ public class UserService {
     }
 
     public User findUserById(Long id) throws Exception{
+
+        notNull(id, "O parametro id é obrigatório");
+
         return this.repository.findUserById(id)
                 .orElseThrow(() -> new Exception("Erro ao encontrar usuário"));
     }
