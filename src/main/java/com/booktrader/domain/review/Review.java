@@ -33,6 +33,8 @@ public class Review {
 
     private String review;
 
+    private int criticNote;
+
     private LocalDateTime createdAt;
 
     public Review(ReviewDTO data){

@@ -36,6 +36,10 @@ public class ReviewService {
         newReview.setWriter(writer);
         newReview.setReview(data.review());
         newReview.setReviewedBook(reviewedBook);
+        if(data.criticNote() < 0 || data.criticNote() > 5){
+            throw new Exception("A nota deve ser um valor entre 0 e 5");
+        }
+        newReview.setCriticNote(data.criticNote());
 
         this.saveReview(newReview);
         writer.getReviews().add(newReview);
