@@ -32,4 +32,9 @@ public class ControllerExceptionHandler {
         ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), "500");
         return ResponseEntity.internalServerError().body(exceptionDTO);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity threathNullPointerException(NullPointerException exception){
+        return ResponseEntity.badRequest().build();
+    }
 }

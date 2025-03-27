@@ -1,0 +1,19 @@
+spring:
+  application:
+  name: booktrader
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:my-secret-key}

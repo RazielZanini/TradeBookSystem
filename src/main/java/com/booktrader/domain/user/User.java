@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Entity(name = "users")
+@Entity()
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @Getter
 @Setter
@@ -27,6 +27,7 @@ public class User implements UserDetails {
     private Long id;
     private String name;
     private String password;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @OneToMany(mappedBy = "owner")
@@ -60,6 +61,6 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return this.email;
     }
 }

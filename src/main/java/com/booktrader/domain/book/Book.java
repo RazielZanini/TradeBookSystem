@@ -3,7 +3,6 @@ package com.booktrader.domain.book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.BookDTO;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;

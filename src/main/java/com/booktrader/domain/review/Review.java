@@ -23,7 +23,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name="writer_id")
-    @JsonIgnoreProperties({"books", "reviews", "password", "authorities"})
+    @JsonIgnoreProperties({"books", "reviews", "password", "authorities", "username"})
     private User writer;
 
     @ManyToOne
