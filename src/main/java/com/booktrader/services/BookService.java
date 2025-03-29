@@ -33,20 +33,21 @@ public class BookService {
         this.repository.save(book);
     }
 
-    public Book createBook(BookDTO data) throws Exception{
+    public Book createBook(BookDTO data){
         Book newBook = new Book(data);
         User owner = this.userService.findUserById(data.owner());
+
         newBook.setOwner(owner);
         owner.getBooks().add(newBook);
+
         this.userService.saveUser(owner);
         this.saveBook(newBook);
 
         return newBook;
     }
 
-    public Book updateBook(Long bookId, BookDTO book) throws Exception{
-        Book foundBook = this.repository.findBookById(bookId)
-                .orElseThrow(() -> new Exception("Erro ao atualizar livro!"));
+    public Book updateBook(Long bookId, BookDTO book) throws Exception {
+        Book foundBook = findBookById(bookId);
         User owner = this.userService.findUserById(book.owner());
 
         owner.getBooks().remove(foundBook);
@@ -67,8 +68,7 @@ public class BookService {
     }
 
     public List<Review> getBookReviews(Long id) throws Exception{
-        Book book = this.repository.findBookById(id)
-                .orElseThrow(() -> new Exception("Livro não encontrado"));
+        Book book = findBookById(id);
 
         return book.getReviews();
     }

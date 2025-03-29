@@ -5,7 +5,6 @@ import com.booktrader.domain.notification.Notification;
 import com.booktrader.domain.trade.Trade;
 import com.booktrader.domain.trade.TradeStatus;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.NotificationDTO;
 import com.booktrader.dtos.TradeDTO;
 import com.booktrader.repositories.TradeRepository;
 import jakarta.transaction.Transactional;
@@ -76,8 +75,7 @@ public class TradeService {
 
     @Transactional
     public void respondToTrade(Long tradeId, boolean accept) throws Exception {
-        Trade trade = this.tradeRepository.findTradeById(tradeId)
-                .orElseThrow(() -> new Exception("Troca não encontrada!"));
+        Trade trade = findTradeById(tradeId);
 
         if(!trade.getStatus().equals(TradeStatus.PENDING)){
             throw new Exception("A troca já foi aceita!");

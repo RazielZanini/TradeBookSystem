@@ -37,17 +37,15 @@ public class UserService {
     }
 
     public List<Book> getBooksByUser(Long id) throws Exception{
-        User user = this.repository.findUserById(id)
-                .orElseThrow(() -> new Exception("Erro ao buscar livros de usuário"));
+        User user = findUserById(id);
 
         return user.getBooks();
     }
 
-    public List<Review> getReviewsByUser(Long id) throws Exception{
-        User user = this.repository.findUserById(id)
-                .orElseThrow(() -> new Exception("Erro ao buscar livros de usuário"));
+    public List<Review> getReviewsByUser(Long id){
+            User user = findUserById(id);
 
-        return user.getReviews();
+            return user.getReviews();
     }
 
     public User updateUser(Long id, UserDTO user) throws Exception{

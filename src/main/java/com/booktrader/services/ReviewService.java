@@ -37,7 +37,7 @@ public class ReviewService {
         newReview.setReview(data.review());
         newReview.setReviewedBook(reviewedBook);
         if(data.criticNote() < 0 || data.criticNote() > 5){
-            throw new Exception("A nota deve ser um valor entre 0 e 5");
+            throw new IllegalArgumentException ("A nota deve ser um valor entre 0 e 5");
         }
         newReview.setCriticNote(data.criticNote());
 
@@ -51,20 +51,19 @@ public class ReviewService {
     }
 
     public Review editReview(Long id, ReviewDTO review) throws Exception{
-        Review foundReview = this.repository.findReviewById(id)
-                .orElseThrow(() -> new Exception("Erro ao encontrar review"));
+        Review foundReview = getReviewById(id);
 
         foundReview.setReview(review.review());
+        foundReview.setCriticNote(review.criticNote());
 
-        this.saveReview(foundReview);
-
-        return foundReview;
+        return this.repository.save(foundReview);
     }
 
     public Review deleteReview(Long id) throws Exception{
         Review deletedReview = this.repository.findReviewById(id)
                 .orElseThrow(() -> new Exception("Erro ao deletar review: Review não encontrada"));
         this.repository.deleteById(id);
+
         return  deletedReview;
     }
 }
