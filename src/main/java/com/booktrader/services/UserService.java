@@ -28,12 +28,12 @@ public class UserService {
         return this.repository.findAll();
     }
 
-    public User findUserById(Long id) throws Exception{
+    public User findUserById(Long id) throws IllegalArgumentException{
 
         notNull(id, "O parametro id é obrigatório");
 
         return this.repository.findUserById(id)
-                .orElseThrow(() -> new Exception("Erro ao encontrar usuário"));
+                .orElseThrow(() -> new IllegalArgumentException("Erro ao encontrar usuário"));
     }
 
     public List<Book> getBooksByUser(Long id) throws Exception{
@@ -51,14 +51,12 @@ public class UserService {
     }
 
     public User updateUser(Long id, UserDTO user) throws Exception{
-        User updateUser = this.repository.findUserById(id)
-                .orElseThrow(() -> new Exception("Erro ao atualizar usuário: Usuário não encontrado"));
+        User updateUser = findUserById(id);
 
         updateUser.setName(user.name());
         updateUser.setPassword(user.password());
+        updateUser.setEmail(user.email());
 
-        this.saveUser(updateUser);
-
-        return updateUser;
+        return repository.save(updateUser);
     }
 }
