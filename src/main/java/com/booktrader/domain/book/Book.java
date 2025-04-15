@@ -27,7 +27,7 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    @JsonIgnoreProperties({"books", "reviews", "password", "authorities"})
+    @JsonIgnoreProperties({"books", "reviews", "password", "authorities", "username", "role", "accountNonExpired", "accountNonLocked", "credentialsNonExpired", "enabled"})
     private User owner;
     private int edition;
 
