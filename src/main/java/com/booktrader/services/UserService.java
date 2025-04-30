@@ -36,7 +36,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Erro ao encontrar usuário"));
     }
 
-    public List<Book> getBooksByUser(Long id) throws Exception{
+    public List<Book> getBooksByUser(Long id){
         User user = findUserById(id);
 
         return user.getBooks();
@@ -48,7 +48,7 @@ public class UserService {
             return user.getReviews();
     }
 
-    public User updateUser(Long id, UserDTO user) throws Exception{
+    public User updateUser(Long id, UserDTO user){
         User updateUser = findUserById(id);
 
         updateUser.setName(user.name());

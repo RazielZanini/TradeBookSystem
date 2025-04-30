@@ -20,8 +20,8 @@ public class BookService {
     @Lazy
     private UserService userService;
 
-    public Book findBookById(Long id) throws Exception{
-        return this.repository.findBookById(id).orElseThrow(() -> new Exception("Livro não encontrado"));
+    public Book findBookById(Long id) throws IllegalArgumentException{
+        return this.repository.findBookById(id).orElseThrow(() -> new IllegalArgumentException("Livro não encontrado"));
     }
 
     public List<Book> findAllBooks(){
@@ -48,7 +48,7 @@ public class BookService {
 
     public Book updateBook(Long bookId, BookDTO book) throws Exception {
         Book foundBook = findBookById(bookId);
-        User owner = this.userService.findUserById(book.owner());
+        User owner = foundBook.getOwner();
 
         owner.getBooks().remove(foundBook);
         foundBook.setTitle(book.title());
