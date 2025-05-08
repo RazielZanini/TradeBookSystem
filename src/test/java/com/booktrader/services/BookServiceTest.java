@@ -16,9 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,14 +70,17 @@ class BookServiceTest {
     @Test
     @DisplayName("Deve retornar lista de livros")
     void deveRetornarUmaListaDeLivros(){
-        List<Book> books = new ArrayList<>();
+        List<Book> books = List.of(book);
+        Pageable pageable = PageRequest.of(0,5);
+        Page<Book> bookPage = new PageImpl<>(books, pageable, 0);
 
-        when(bookRepository.findAll()).thenReturn(books);
+        when(bookRepository.findAll(pageable)).thenReturn(bookPage);
 
-        books = bookService.findAllBooks();
+        Page<Book> result = bookService.listBooks(pageable);
 
-        Assertions.assertNotNull(books);
-        Mockito.verify(bookRepository).findAll();
+        Assertions.assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        Mockito.verify(bookRepository).findAll(pageable);
         Mockito.verifyNoMoreInteractions(bookRepository);
         System.out.println("Encontrada lista de livros");
     }
