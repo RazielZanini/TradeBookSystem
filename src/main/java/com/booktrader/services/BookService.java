@@ -5,12 +5,13 @@ import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.BookDTO;
 import com.booktrader.repositories.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookService {
@@ -24,9 +25,9 @@ public class BookService {
         return this.repository.findBookById(id).orElseThrow(() -> new IllegalArgumentException("Livro não encontrado"));
     }
 
-    public List<Book> findAllBooks(){
+    public Page<Book> listBooks(Pageable pageable){
 
-        return this.repository.findAll();
+        return this.repository.findAll(pageable);
     }
 
     public void saveBook(Book book){

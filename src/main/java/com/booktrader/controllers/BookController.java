@@ -5,6 +5,8 @@ import com.booktrader.domain.review.Review;
 import com.booktrader.dtos.BookDTO;
 import com.booktrader.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,8 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks(){
-        List<Book> books = this.bookService.findAllBooks();
+    public ResponseEntity<Page<Book>> getAllBooks(Pageable pageable){
+        Page<Book> books = this.bookService.listBooks(pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
