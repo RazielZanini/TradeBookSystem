@@ -2,7 +2,7 @@
 import Header from "@/components/infra/header"
 import { useEffect, useState } from "react"
 
-export default function Home() {
+export default function Profile() {
 
   const [user, setUser] = useState({})
 
