@@ -1,7 +1,8 @@
 package com.booktrader.controllers;
 
 import com.booktrader.domain.review.Review;
-import com.booktrader.dtos.ReviewDTO;
+import com.booktrader.dtos.request.RequestReviewDTO;
+import com.booktrader.dtos.response.ResponseReviewDTO;
 import com.booktrader.services.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,14 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody ReviewDTO data) throws Exception{
-        Review newReview = this.reviewService.createReview(data);
+    public ResponseEntity<ResponseReviewDTO> createReview(@RequestBody RequestReviewDTO data) throws Exception{
+        ResponseReviewDTO newReview = this.reviewService.createReview(data);
         return new ResponseEntity<>(newReview, HttpStatus.CREATED);
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<Review> updateReview(@PathVariable("reviewId")Long reviewId, ReviewDTO data) throws Exception{
-        Review updatedReview = this.reviewService.editReview(reviewId, data);
+    public ResponseEntity<ResponseReviewDTO> updateReview(@PathVariable("reviewId")Long reviewId, RequestReviewDTO data) throws Exception{
+        ResponseReviewDTO updatedReview = this.reviewService.editReview(reviewId, data);
         return new ResponseEntity<>(updatedReview, HttpStatus.OK);
     }
 

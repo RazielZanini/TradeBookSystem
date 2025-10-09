@@ -4,7 +4,7 @@ import com.booktrader.domain.book.Book;
 import com.booktrader.domain.book.ConservStatus;
 import com.booktrader.domain.user.User;
 import com.booktrader.domain.user.UserRole;
-import com.booktrader.dtos.UserDTO;
+import com.booktrader.dtos.request.UserRequestDTO;
 import com.booktrader.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +32,19 @@ public class UserServiceTest {
 
     User user;
     Book book;
-    UserDTO userDTO;
+    UserRequestDTO userRequestDTO;
 
     @BeforeEach
     public void setUp(){
-        user = new User("Raziel", "123123", UserRole.USER, "raziel@gmail.com");
+        user = User.builder()
+                .name("teste")
+                .password("teste")
+                .role(UserRole.ADMIN)
+                .email("teste@teste.com")
+                .build();
         user.setId(1L);
         book = new Book("teste", "autor teste", "", user, 1, ConservStatus.NEW);
-        userDTO = new UserDTO("novo nome","novasenha", UserRole.USER, "novoemail");
+        userRequestDTO = new UserRequestDTO("novo nome","novasenha", UserRole.USER, "novoemail");
     }
 
     @Test
@@ -76,12 +81,12 @@ public class UserServiceTest {
         when(repository.findUserById(user.getId())).thenReturn(Optional.of(user)); // quando o metodo for utilizado retorna um user
         when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0)); // quando repositorio.save for chamado retorna o argumento inicial
 
-        User updatedUser = userService.updateUser(user.getId(), userDTO); // Recebe usuário atualizado
+        User updatedUser = userService.updateUser(user.getId(), userRequestDTO); // Recebe usuário atualizado
 
         assertEquals(user.getId(), updatedUser.getId()); // Compara o usuário é o mesmo
-        assertEquals(userDTO.name(), updatedUser.getName()); // Compara se o nome alterado é o mesmo do solicitado
-        assertEquals(userDTO.password(), updatedUser.getPassword());
-        assertEquals(userDTO.email(), updatedUser.getEmail());
+        assertEquals(userRequestDTO.name(), updatedUser.getName()); // Compara se o nome alterado é o mesmo do solicitado
+        assertEquals(userRequestDTO.password(), updatedUser.getPassword());
+        assertEquals(userRequestDTO.email(), updatedUser.getEmail());
 
         verify(repository).findUserById(user.getId());
         verify(repository).save(any(User.class));

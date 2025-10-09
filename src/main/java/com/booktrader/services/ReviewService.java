@@ -3,7 +3,10 @@ package com.booktrader.services;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.ReviewDTO;
+import com.booktrader.dtos.request.RequestReviewDTO;
+import com.booktrader.dtos.response.ResponseBookDTO;
+import com.booktrader.dtos.response.ResponseReviewDTO;
+import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,7 @@ public class ReviewService {
                 .orElseThrow(() -> new Exception("Review não encontrada!"));
     }
 
-    public Review createReview(ReviewDTO data) throws Exception{
+    public ResponseReviewDTO createReview(RequestReviewDTO data) throws Exception{
         User writer = this.userService.findUserById(data.writer());
         Book reviewedBook = this.bookService.findBookById(data.reviewedBook());
 
@@ -47,16 +50,33 @@ public class ReviewService {
         this.bookService.saveBook(reviewedBook);
         this.userService.saveUser(writer);
 
-        return newReview;
+        return new ResponseReviewDTO(
+                newReview.getId(),
+                new UserBasicDTO(writer.getId(), writer.getName(), writer.getEmail()),
+                new ResponseBookDTO(reviewedBook.getId(), reviewedBook.getTitle(), reviewedBook.getAuthor(), reviewedBook.getImage()),
+                newReview.getReview(),
+                newReview.getCriticNote(),
+                newReview.getCreatedAt());
     }
 
-    public Review editReview(Long id, ReviewDTO review) throws Exception{
+    public ResponseReviewDTO editReview(Long id, RequestReviewDTO review) throws Exception{
         Review foundReview = getReviewById(id);
 
         foundReview.setReview(review.review());
         foundReview.setCriticNote(review.criticNote());
 
-        return this.repository.save(foundReview);
+        User writer = foundReview.getWriter();
+        Book book = foundReview.getReviewedBook();
+
+        this.repository.save(foundReview);
+
+        return new ResponseReviewDTO(
+                foundReview.getId(),
+                new UserBasicDTO(writer.getId(), writer.getName(), writer.getEmail()),
+                new ResponseBookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getImage()),
+                foundReview.getReview(),
+                foundReview.getCriticNote(),
+                foundReview.getCreatedAt());
     }
 
     public Review deleteReview(Long id) throws Exception{

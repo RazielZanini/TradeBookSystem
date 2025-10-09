@@ -1,4 +1,4 @@
 package com.booktrader.dtos;
 
-public record LoginResponseDTO(String token) {
+public record LoginResponseDTO(String token, String message) {
 }

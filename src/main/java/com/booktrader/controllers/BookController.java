@@ -2,7 +2,9 @@ package com.booktrader.controllers;
 
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
-import com.booktrader.dtos.BookDTO;
+import com.booktrader.dtos.request.RequestBookDTO;
+import com.booktrader.dtos.response.ResponseBookDTO;
+import com.booktrader.dtos.response.ResponseReviewDTO;
 import com.booktrader.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,19 +23,19 @@ public class BookController {
     private BookService bookService;
 
     @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody BookDTO book) throws Exception{
-        Book newBook = this.bookService.createBook(book);
+    public ResponseEntity<ResponseBookDTO> createBook(@RequestBody RequestBookDTO book) throws Exception{
+        ResponseBookDTO newBook = this.bookService.createBook(book);
         return new ResponseEntity<>(newBook, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<Page<Book>> getAllBooks(Pageable pageable){
-        Page<Book> books = this.bookService.listBooks(pageable);
+    public ResponseEntity<List<ResponseBookDTO>> getAllBooks(){
+        List<ResponseBookDTO> books = this.bookService.listBooks();
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<Book> editBook(@RequestBody BookDTO data,@PathVariable("bookId") Long bookId) throws Exception {
+    public ResponseEntity<Book> editBook(@RequestBody RequestBookDTO data, @PathVariable("bookId") Long bookId) throws Exception {
         Book updatedBook = this.bookService.updateBook(bookId, data);
         return new ResponseEntity<>(updatedBook, HttpStatus.CREATED);
     }
@@ -46,8 +48,8 @@ public class BookController {
     }
 
     @GetMapping("/{bookId}/reviews")
-    public ResponseEntity<List<Review>> getBookReviews(@PathVariable Long bookId) throws Exception{
-        List<Review> reviews = this.bookService.getBookReviews(bookId);
+    public ResponseEntity<List<ResponseReviewDTO>> getBookReviews(@PathVariable Long bookId) throws Exception{
+        List<ResponseReviewDTO> reviews = this.bookService.getBookReviews(bookId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }

@@ -2,7 +2,7 @@ package com.booktrader.domain.review;
 
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.ReviewDTO;
+import com.booktrader.dtos.request.RequestReviewDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,7 +37,7 @@ public class Review {
 
     private LocalDateTime createdAt;
 
-    public Review(ReviewDTO data){
+    public Review(RequestReviewDTO data){
         this.review = data.review();
     }
 

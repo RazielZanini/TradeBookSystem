@@ -3,7 +3,8 @@ package com.booktrader.controllers;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.UserDTO;
+import com.booktrader.dtos.request.UserRequestDTO;
+import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,13 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
-        List<User> users = this.userService.getAllUsers();
+    public ResponseEntity<List<UserBasicDTO>> getAllUsers(){
+        List<UserBasicDTO> users = this.userService.getAllUsers();
         return  new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> editUser(@RequestBody UserDTO data, @PathVariable("userId") Long userId) throws Exception {
+    public ResponseEntity<User> editUser(@RequestBody UserRequestDTO data, @PathVariable("userId") Long userId) throws Exception {
         User updatedUser = userService.updateUser(userId, data);
         return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
     }

@@ -5,13 +5,18 @@ import com.booktrader.domain.notification.Notification;
 import com.booktrader.domain.trade.Trade;
 import com.booktrader.domain.trade.TradeStatus;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.TradeDTO;
+import com.booktrader.dtos.request.RequestTradeDTO;
+import com.booktrader.dtos.response.ResponseBookDTO;
+import com.booktrader.dtos.response.ResponseTradeDTO;
+import com.booktrader.dtos.response.UserBasicDTO;
+import com.booktrader.infra.exceptions.ControllerExceptionHandler;
 import com.booktrader.repositories.TradeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TradeService {
@@ -39,38 +44,34 @@ public class TradeService {
 
 
     @Transactional
-    public Trade createTrade(TradeDTO trade) throws Exception {
+    public ResponseTradeDTO createTrade(RequestTradeDTO trade) throws Exception {
 
         User sender = this.userService.findUserById(trade.sender());
         User receiver = this.userService.findUserById(trade.receiver());
         Book receiverBook = this.bookService.findBookById(trade.receiverBook());
         Book senderBook = this.bookService.findBookById(trade.senderBook());
 
-        if (sender.equals(receiver)) {
-            throw new Exception("Não é possível uma troca entre o mesmo usuário.");
-        }
-
-        if (!senderBook.getOwner().equals(sender)) {
-            throw new Exception("O usuário remetente não possui este livro.");
-        }
-
-        if (!receiverBook.getOwner().equals(receiver)) {
-            throw new Exception("O usuário destinatário não possui este livro.");
-        }
+        validateTrade(sender, receiver, senderBook, receiverBook);
 
         // Cria a troca com status "PENDING"
-        Trade newTrade = new Trade();
-        newTrade.setSenderBook(senderBook);
-        newTrade.setReceiverBook(receiverBook);
-        newTrade.setReceiver(receiver);
-        newTrade.setSender(sender);
-        newTrade.setStatus(TradeStatus.PENDING);
+        Trade newTrade = Trade.builder()
+                .senderBook(senderBook)
+                .receiverBook(receiverBook)
+                .receiver(receiver)
+                .sender(sender)
+                .status(TradeStatus.PENDING)
+                .build();
 
         this.tradeRepository.save(newTrade);
 
-        notificateUser(sender, receiver, receiverBook, senderBook, newTrade.getId());
+        notificationService.NotificateTradeToUser(sender, receiver, receiverBook, senderBook, newTrade.getId());
 
-        return newTrade;
+        return new ResponseTradeDTO(
+                new UserBasicDTO(sender.getId(), sender.getName(), sender.getEmail()),
+                new UserBasicDTO(receiver.getId(), receiver.getName(), receiver.getEmail()),
+                new ResponseBookDTO(senderBook.getId(), senderBook.getTitle(), senderBook.getAuthor(), senderBook.getImage()),
+                new ResponseBookDTO(receiverBook.getId(), receiverBook.getTitle(), receiverBook.getAuthor(), receiverBook.getImage())
+        );
     }
 
     @Transactional
@@ -118,5 +119,17 @@ public class TradeService {
 
         Notification notification = new Notification(message, userBook, tradeBook, receiver, tradeId);
         this.notificationService.saveNotification(notification);
+    }
+
+    private void validateTrade(User sender, User receiver, Book senderBook, Book receiverBook) {
+        if (Objects.equals(sender.getId(), receiver.getId())) {
+            throw new RuntimeException("Não é possível uma troca entre o mesmo usuário.");
+        }
+        if (!Objects.equals(senderBook.getOwner().getId(), sender.getId())) {
+            throw new RuntimeException("O usuário remetente não possui este livro.");
+        }
+        if (!Objects.equals(receiverBook.getOwner().getId(), receiver.getId())) {
+            throw new RuntimeException("O usuário destinatário não possui este livro.");
+        }
     }
 }

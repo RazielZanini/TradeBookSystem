@@ -37,4 +37,10 @@ public class ControllerExceptionHandler {
     public ResponseEntity threathNullPointerException(NullPointerException exception){
         return ResponseEntity.badRequest().build();
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity treathRuntimeException(RuntimeException exception){
+        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), "404");
+        return ResponseEntity.notFound().build();
+    }
 }

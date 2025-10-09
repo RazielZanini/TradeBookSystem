@@ -1,6 +1,8 @@
 package com.booktrader.services;
 
+import com.booktrader.domain.book.Book;
 import com.booktrader.domain.notification.Notification;
+import com.booktrader.domain.user.User;
 import com.booktrader.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,14 @@ public class NotificationService {
         this.notificationRepository.saveAll(notifications);
 
         return notifications;
+    }
+
+    public void NotificateTradeToUser(User sender, User receiver, Book userBook, Book tradeBook, Long tradeId) {
+        String message = sender.getName() + " propôs uma troca do seu livro '" + tradeBook.getTitle() +
+                "' por '" + userBook.getTitle() + "'. Você aceita? (ID da troca: " + tradeId + ")";
+
+        Notification notification = new Notification(message, userBook, tradeBook, receiver, tradeId);
+        this.saveNotification(notification);
     }
 
 }

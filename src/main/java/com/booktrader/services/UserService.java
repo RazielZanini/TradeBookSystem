@@ -3,12 +3,14 @@ package com.booktrader.services;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.UserDTO;
+import com.booktrader.dtos.request.UserRequestDTO;
+import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -24,8 +26,15 @@ public class UserService {
         this.repository.save(user);
     }
 
-    public List<User> getAllUsers(){
-        return this.repository.findAll();
+    public List<UserBasicDTO> getAllUsers(){
+        return this.repository.findAll()
+                .stream()
+                .map(user -> new UserBasicDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ))
+                .collect(Collectors.toList());
     }
 
     public User findUserById(Long id) throws IllegalArgumentException{
@@ -48,7 +57,7 @@ public class UserService {
             return user.getReviews();
     }
 
-    public User updateUser(Long id, UserDTO user){
+    public User updateUser(Long id, UserRequestDTO user){
         User updateUser = findUserById(id);
 
         updateUser.setName(user.name());

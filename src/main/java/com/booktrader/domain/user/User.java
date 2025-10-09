@@ -2,7 +2,7 @@ package com.booktrader.domain.user;
 
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
-import com.booktrader.dtos.UserDTO;
+import com.booktrader.dtos.request.UserRequestDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,10 +16,10 @@ import java.util.List;
 
 @Entity()
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of="id")
 public class User implements UserDetails {
     @Id
@@ -39,18 +39,11 @@ public class User implements UserDetails {
 
     private String email;
 
-    public User(UserDTO data){
+    public User(UserRequestDTO data){
         this.name = data.name();
         this.password = data.password();
         this.role = UserRole.USER;
         this.email = data.email();
-    }
-
-    public User(String name, String password, UserRole role, String email){
-        this.name = name;
-        this.password = password;
-        this.role = role;
-        this.email = email;
     }
 
     @Override

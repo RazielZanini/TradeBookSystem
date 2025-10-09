@@ -2,11 +2,10 @@ package com.booktrader.domain.book;
 
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.BookDTO;
+import com.booktrader.dtos.request.RequestBookDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class Book {
     @OneToMany(mappedBy = "reviewedBook")
     private List<Review> reviews = new ArrayList<>();
 
-    public Book(BookDTO data){
+    public Book(RequestBookDTO data){
         this.title = data.title();
         this.author = data.author();
         this.conservStatus = data.conservStatus();

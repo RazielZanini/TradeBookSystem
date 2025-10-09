@@ -1,7 +1,8 @@
 package com.booktrader.controllers;
 
 import com.booktrader.domain.trade.Trade;
-import com.booktrader.dtos.TradeDTO;
+import com.booktrader.dtos.request.RequestTradeDTO;
+import com.booktrader.dtos.response.ResponseTradeDTO;
 import com.booktrader.services.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,8 @@ public class TradeController {
     }
 
     @PostMapping
-    public ResponseEntity<Trade> createTrade(@RequestBody TradeDTO data) throws Exception {
-        Trade newTrade = this.tradeService.createTrade(data);
+    public ResponseEntity<ResponseTradeDTO> createTrade(@RequestBody RequestTradeDTO data) throws Exception {
+        ResponseTradeDTO newTrade = this.tradeService.createTrade(data);
         return new ResponseEntity<>(newTrade, HttpStatus.CREATED);
     }
 
