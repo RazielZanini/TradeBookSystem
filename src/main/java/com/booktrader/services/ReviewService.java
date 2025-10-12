@@ -3,13 +3,20 @@ package com.booktrader.services;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
+import com.booktrader.dtos.ExceptionDTO;
+import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestReviewDTO;
 import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
 import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.ReviewRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -25,9 +32,35 @@ public class ReviewService {
         this.repository.save(review);
     }
 
-    public Review getReviewById(Long id) throws Exception{
-        return this.repository.findReviewById(id)
-                .orElseThrow(() -> new Exception("Review não encontrada!"));
+    public Review findReviewById(Long id){
+        return this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public ResponseReviewDTO getReviewById(Long id) throws Exception{
+        Review review = this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        return new ResponseReviewDTO(
+                id,
+                new UserBasicDTO(review.getWriter().getId(), review.getWriter().getName(), review.getWriter().getEmail()),
+                new ResponseBookDTO(review.getReviewedBook().getId(), review.getReviewedBook().getTitle(), review.getReviewedBook().getAuthor(), review.getReviewedBook().getImage()),
+                review.getReview(),
+                review.getCriticNote(),
+                review.getCreatedAt()
+        );
+    }
+
+    public List<ResponseReviewDTO> getLatestReviewByUser(Long userId){
+        return this.repository.findLatestReviewByUser(userId)
+                .stream()
+                .map(review -> new ResponseReviewDTO(
+                        review.getId(),
+                        new UserBasicDTO(review.getWriter().getId(), review.getWriter().getName(), review.getWriter().getEmail()),
+                        new ResponseBookDTO(review.getReviewedBook().getId(), review.getReviewedBook().getTitle(), review.getReviewedBook().getAuthor(), review.getReviewedBook().getImage()),
+                        review.getReview(),
+                        review.getCriticNote(),
+                        review.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
     }
 
     public ResponseReviewDTO createReview(RequestReviewDTO data) throws Exception{
@@ -59,8 +92,8 @@ public class ReviewService {
                 newReview.getCreatedAt());
     }
 
-    public ResponseReviewDTO editReview(Long id, RequestReviewDTO review) throws Exception{
-        Review foundReview = getReviewById(id);
+    public ResponseReviewDTO editReview(Long id, RequestReviewDTO review) {
+        Review foundReview = this.findReviewById(id);
 
         foundReview.setReview(review.review());
         foundReview.setCriticNote(review.criticNote());
@@ -79,11 +112,14 @@ public class ReviewService {
                 foundReview.getCreatedAt());
     }
 
-    public Review deleteReview(Long id) throws Exception{
-        Review deletedReview = this.repository.findReviewById(id)
-                .orElseThrow(() -> new Exception("Erro ao deletar review: Review não encontrada"));
+    public SuccessMessageDTO deleteReview(Long id) throws Exception{
+
+        if(this.findReviewById(id) == null){
+            throw new RuntimeException("Review não encontrada!");
+        }
+
         this.repository.deleteById(id);
 
-        return  deletedReview;
+        return new SuccessMessageDTO("Review excluida com sucesso!", "200");
     }
 }

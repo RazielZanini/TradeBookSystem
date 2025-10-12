@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
         // Permite CORS para todos os endpoints
         registry.addMapping("/**") // Isso aplica CORS a todas as rotas da API
                 .allowedOrigins("http://localhost:3000") // Permite apenas o frontend da porta 3000
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos permitidos
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Métodos permitidos
                 .allowedHeaders("*") // Permite todos os cabeçalhos
                 .allowCredentials(true); // Permite o envio de cookies se necessário
     }

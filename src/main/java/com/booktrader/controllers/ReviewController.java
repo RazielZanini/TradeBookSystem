@@ -1,6 +1,8 @@
 package com.booktrader.controllers;
 
 import com.booktrader.domain.review.Review;
+import com.booktrader.dtos.ExceptionDTO;
+import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestReviewDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
 import com.booktrader.services.ReviewService;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {
@@ -16,8 +20,8 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @GetMapping("/{reviewId}")
-    public ResponseEntity<Review> getReview(@PathVariable("reviewId") Long reviewId) throws Exception{
-        Review review = this.reviewService.getReviewById(reviewId);
+    public ResponseEntity<ResponseReviewDTO> getReview(@PathVariable("reviewId") Long reviewId) throws Exception{
+        ResponseReviewDTO review = this.reviewService.getReviewById(reviewId);
         return new ResponseEntity<>(review, HttpStatus.OK);
     }
 
@@ -34,8 +38,14 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Review> deleteReview(@PathVariable("reviewId")Long reviewId) throws Exception{
-        Review deletedReview = this.reviewService.deleteReview(reviewId);
+    public ResponseEntity<SuccessMessageDTO> deleteReview(@PathVariable("reviewId")Long reviewId) throws Exception{
+        SuccessMessageDTO deletedReview = this.reviewService.deleteReview(reviewId);
         return new ResponseEntity<>(deletedReview, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ResponseReviewDTO>> getLatestReviewByUser(@PathVariable("userId") Long userId){
+        List<ResponseReviewDTO> reviews = this.reviewService.getLatestReviewByUser(userId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 }
