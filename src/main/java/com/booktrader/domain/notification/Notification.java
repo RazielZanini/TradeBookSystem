@@ -24,17 +24,14 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_book_id")
-    @JsonIgnoreProperties({"owner", "reviews"})
     private Book userBook;
 
     @ManyToOne
     @JoinColumn(name = "trade_book_id")
-    @JsonIgnoreProperties({"owner", "reviews"})
     private Book tradeBook;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"books", "reviews", "password", "authorities"})
     private User user;
 
     private Long tradeId;

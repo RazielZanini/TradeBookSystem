@@ -3,7 +3,6 @@ package com.booktrader.domain.user;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.dtos.request.UserRequestDTO;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,7 +30,6 @@ public class User implements UserDetails {
     private UserRole role;
 
     @OneToMany(mappedBy = "owner")
-    @JsonIgnoreProperties("owner")
     private List<Book> books = new ArrayList<>();
 
     @OneToMany(mappedBy = "writer")

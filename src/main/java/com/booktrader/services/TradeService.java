@@ -44,7 +44,7 @@ public class TradeService {
 
 
     @Transactional
-    public ResponseTradeDTO createTrade(RequestTradeDTO trade) throws Exception {
+    public ResponseTradeDTO createTrade(RequestTradeDTO trade){
 
         User sender = this.userService.findUserById(trade.sender());
         User receiver = this.userService.findUserById(trade.receiver());
@@ -76,50 +76,45 @@ public class TradeService {
 
     @Transactional
     public void respondToTrade(Long tradeId, boolean accept) throws Exception {
-        Trade trade = findTradeById(tradeId);
 
-        if(!trade.getStatus().equals(TradeStatus.PENDING)){
-            throw new Exception("A troca já foi aceita!");
+        Trade trade = this.findTradeById(tradeId);
+
+        if (!trade.getStatus().equals(TradeStatus.PENDING)) {
+            throw new IllegalStateException("A troca já foi processada.");
         }
 
         if (accept) {
-            // Realiza a troca
             User sender = trade.getSender();
             User receiver = trade.getReceiver();
             Book senderBook = trade.getSenderBook();
             Book receiverBook = trade.getReceiverBook();
 
+            // Troca de livros entre usuários
             sender.getBooks().remove(senderBook);
-            sender.getBooks().add(receiverBook);
             receiver.getBooks().remove(receiverBook);
+            sender.getBooks().add(receiverBook);
             receiver.getBooks().add(senderBook);
+
+            // Atualiza os donos dos livros
             senderBook.setOwner(receiver);
             receiverBook.setOwner(sender);
 
-            //Salva as mudanças
-            this.userService.saveUser(sender);
-            this.userService.saveUser(receiver);
-            this.bookService.saveBook(senderBook);
-            this.bookService.saveBook(receiverBook);
+            // Persiste as alterações
+            userService.saveUser(sender);
+            userService.saveUser(receiver);
+            bookService.saveBook(senderBook);
+            bookService.saveBook(receiverBook);
 
-            //Atualiza o status para "COMPLETE"
             trade.setStatus(TradeStatus.COMPLETED);
-            this.tradeRepository.save(trade);
-
-        } else{
-            //Atualiza status para "REJECTED"
+            // notificateUser(...) — opcional
+        } else {
             trade.setStatus(TradeStatus.REJECTED);
-            this.tradeRepository.save(trade);
+            // notificateUser(...) — opcional
         }
+
+        tradeRepository.save(trade);
     }
 
-    public void notificateUser(User sender, User receiver, Book userBook, Book tradeBook, Long tradeId) {
-        String message = sender.getName() + " propôs uma troca do seu livro '" + tradeBook.getTitle() +
-                "' por '" + userBook.getTitle() + "'. Você aceita? (ID da troca: " + tradeId + ")";
-
-        Notification notification = new Notification(message, userBook, tradeBook, receiver, tradeId);
-        this.notificationService.saveNotification(notification);
-    }
 
     private void validateTrade(User sender, User receiver, Book senderBook, Book receiverBook) {
         if (Objects.equals(sender.getId(), receiver.getId())) {
