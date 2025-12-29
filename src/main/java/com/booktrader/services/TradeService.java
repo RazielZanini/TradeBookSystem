@@ -1,15 +1,11 @@
 package com.booktrader.services;
 
 import com.booktrader.domain.book.Book;
-import com.booktrader.domain.notification.Notification;
 import com.booktrader.domain.trade.Trade;
 import com.booktrader.domain.trade.TradeStatus;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.request.RequestTradeDTO;
-import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseTradeDTO;
-import com.booktrader.dtos.response.UserBasicDTO;
-import com.booktrader.infra.exceptions.ControllerExceptionHandler;
 import com.booktrader.repositories.TradeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -76,7 +72,7 @@ public class TradeService {
     }
 
     @Transactional
-    public void respondToTrade(Long tradeId, boolean accept, Long loggedUserId) throws Exception {
+    public void respondToTrade(Long tradeId, boolean accept, Long loggedUserId){
 
         Trade trade = this.findTradeById(tradeId);
 

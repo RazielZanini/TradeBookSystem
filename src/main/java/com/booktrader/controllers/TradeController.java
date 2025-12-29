@@ -2,18 +2,15 @@ package com.booktrader.controllers;
 
 import com.booktrader.domain.trade.Trade;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.ExceptionDTO;
 import com.booktrader.dtos.request.RequestTradeDTO;
 import com.booktrader.dtos.response.ResponseTradeDTO;
 import com.booktrader.dtos.response.TradeResponseMessageDTO;
 import com.booktrader.services.TradeService;
-import com.booktrader.services.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,13 +29,13 @@ public class TradeController {
     }
 
     @GetMapping("/{tradeId}")
-    public ResponseEntity<Trade> getTradeById(@PathVariable("tradeId") Long tradeId) throws Exception {
+    public ResponseEntity<Trade> getTradeById(@PathVariable("tradeId") Long tradeId){
         Trade trade = this.tradeService.findTradeById(tradeId);
         return new ResponseEntity<>(trade, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<ResponseTradeDTO> createTrade(@RequestBody RequestTradeDTO data) throws Exception {
+    public ResponseEntity<ResponseTradeDTO> createTrade(@RequestBody RequestTradeDTO data){
         ResponseTradeDTO newTrade = this.tradeService.createTrade(data);
         return new ResponseEntity<>(newTrade, HttpStatus.CREATED);
     }

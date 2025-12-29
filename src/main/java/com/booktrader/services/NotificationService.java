@@ -5,7 +5,6 @@ import com.booktrader.domain.notification.Notification;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.response.ResponseNotificationDTO;
 import com.booktrader.repositories.NotificationRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class NotificationService {
     public void saveNotification(Notification notification) { this.notificationRepository.save(notification); }
 
     @Transactional
-    public List<ResponseNotificationDTO> getUnreadNotifications(Long userId) throws Exception {
+    public List<ResponseNotificationDTO> getUnreadNotifications(Long userId){
         List<Notification> notifications = this.notificationRepository.findByUserIdAndReadFalse(userId);
 
         if (notifications.isEmpty()) {

@@ -1,7 +1,6 @@
 package com.booktrader.services;
 
 import com.booktrader.domain.book.Book;
-import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestBookDTO;
@@ -13,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -32,7 +32,7 @@ public class ReviewService {
         return this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-    public ResponseReviewDTO getReviewById(Long id) throws Exception{
+    public ResponseReviewDTO getReviewById(Long id){
         Review review = this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         return ResponseReviewDTO.from(review);
@@ -45,7 +45,7 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseReviewDTO createReview(RequestReviewDTO data) throws Exception{
+    public ResponseReviewDTO createReview(RequestReviewDTO data){
         User writer = this.userService.findUserById(data.writer());
         Book reviewedBook = this.bookService.findBookById(data.reviewedBook());
 
@@ -79,7 +79,7 @@ public class ReviewService {
         return ResponseReviewDTO.from(foundReview);
     }
 
-    public SuccessMessageDTO deleteReview(Long id) throws Exception{
+    public SuccessMessageDTO deleteReview(Long id){
 
         if(this.findReviewById(id) == null){
             throw new RuntimeException("Review não encontrada!");
