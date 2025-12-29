@@ -2,6 +2,7 @@ package com.booktrader.controllers;
 
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
+import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestBookDTO;
 import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
@@ -35,16 +36,15 @@ public class BookController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<Book> editBook(@RequestBody RequestBookDTO data, @PathVariable("bookId") Long bookId) throws Exception {
-        Book updatedBook = this.bookService.updateBook(bookId, data);
+    public ResponseEntity<ResponseBookDTO> editBook(@RequestBody RequestBookDTO data, @PathVariable("bookId") Long bookId) throws Exception {
+        ResponseBookDTO updatedBook = this.bookService.updateBook(bookId, data);
         return new ResponseEntity<>(updatedBook, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Book> deleteBook(@PathVariable("bookId") Long bookId) throws Exception{
-        Book deletedBook = this.bookService.findBookById(bookId);
-        this.bookService.deleteBook(bookId);
-        return new ResponseEntity<>(deletedBook, HttpStatus.OK);
+    public ResponseEntity<SuccessMessageDTO> deleteBook(@PathVariable("bookId") Long bookId) throws Exception{
+        SuccessMessageDTO message = this.bookService.deleteBook(bookId);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @GetMapping("/{bookId}/reviews")

@@ -40,7 +40,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity treathRuntimeException(RuntimeException exception){
-        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), "404");
+        ExceptionDTO exceptionDTO = new ExceptionDTO(exception.getMessage(), "500");
         return ResponseEntity.notFound().build();
     }
 }

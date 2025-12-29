@@ -3,19 +3,15 @@ package com.booktrader.services;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
-import com.booktrader.dtos.ExceptionDTO;
 import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestReviewDTO;
-import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
-import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.ReviewRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,27 +35,13 @@ public class ReviewService {
     public ResponseReviewDTO getReviewById(Long id) throws Exception{
         Review review = this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        return new ResponseReviewDTO(
-                id,
-                new UserBasicDTO(review.getWriter().getId(), review.getWriter().getName(), review.getWriter().getEmail()),
-                new ResponseBookDTO(review.getReviewedBook().getId(), review.getReviewedBook().getTitle(), review.getReviewedBook().getAuthor(), review.getReviewedBook().getImage()),
-                review.getReview(),
-                review.getCriticNote(),
-                review.getCreatedAt()
-        );
+        return ResponseReviewDTO.from(review);
     }
 
     public List<ResponseReviewDTO> getLatestReviewByUser(Long userId){
         return this.repository.findLatestReviewByUser(userId)
                 .stream()
-                .map(review -> new ResponseReviewDTO(
-                        review.getId(),
-                        new UserBasicDTO(review.getWriter().getId(), review.getWriter().getName(), review.getWriter().getEmail()),
-                        new ResponseBookDTO(review.getReviewedBook().getId(), review.getReviewedBook().getTitle(), review.getReviewedBook().getAuthor(), review.getReviewedBook().getImage()),
-                        review.getReview(),
-                        review.getCriticNote(),
-                        review.getCreatedAt()
-                ))
+                .map(ResponseReviewDTO::from)
                 .collect(Collectors.toList());
     }
 
@@ -83,13 +65,7 @@ public class ReviewService {
         this.bookService.saveBook(reviewedBook);
         this.userService.saveUser(writer);
 
-        return new ResponseReviewDTO(
-                newReview.getId(),
-                new UserBasicDTO(writer.getId(), writer.getName(), writer.getEmail()),
-                new ResponseBookDTO(reviewedBook.getId(), reviewedBook.getTitle(), reviewedBook.getAuthor(), reviewedBook.getImage()),
-                newReview.getReview(),
-                newReview.getCriticNote(),
-                newReview.getCreatedAt());
+        return ResponseReviewDTO.from(newReview);
     }
 
     public ResponseReviewDTO editReview(Long id, RequestReviewDTO review) {
@@ -98,18 +74,9 @@ public class ReviewService {
         foundReview.setReview(review.review());
         foundReview.setCriticNote(review.criticNote());
 
-        User writer = foundReview.getWriter();
-        Book book = foundReview.getReviewedBook();
-
         this.repository.save(foundReview);
 
-        return new ResponseReviewDTO(
-                foundReview.getId(),
-                new UserBasicDTO(writer.getId(), writer.getName(), writer.getEmail()),
-                new ResponseBookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getImage()),
-                foundReview.getReview(),
-                foundReview.getCriticNote(),
-                foundReview.getCreatedAt());
+        return ResponseReviewDTO.from(foundReview);
     }
 
     public SuccessMessageDTO deleteReview(Long id) throws Exception{

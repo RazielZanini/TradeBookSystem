@@ -1,12 +1,19 @@
 package com.booktrader.controllers;
 
 import com.booktrader.domain.trade.Trade;
+import com.booktrader.domain.user.User;
+import com.booktrader.dtos.ExceptionDTO;
 import com.booktrader.dtos.request.RequestTradeDTO;
 import com.booktrader.dtos.response.ResponseTradeDTO;
+import com.booktrader.dtos.response.TradeResponseMessageDTO;
 import com.booktrader.services.TradeService;
+import com.booktrader.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +44,23 @@ public class TradeController {
     }
 
     @PostMapping("/{tradeId}/respond")
-    public ResponseEntity<String> respondTrade(@PathVariable Long tradeId, @RequestParam boolean accept) {
+    public ResponseEntity<?> respondTrade(@PathVariable Long tradeId, @RequestParam boolean accept, @AuthenticationPrincipal User userDetails) {
         try{
-            tradeService.respondToTrade(tradeId, accept);
-            return ResponseEntity.ok("Troca " + (accept ? "aceita!":"recusada"));
+            tradeService.respondToTrade(tradeId, accept, userDetails.getId());
+
+            return ResponseEntity.ok(
+                    new TradeResponseMessageDTO(
+                            tradeId,
+                            accept ? "COMPLETED" : "REJECTED",
+                            accept ? "Troca aceita com sucesso!" : "Troca rejeitada com sucesso!"
+                    )
+            );
+        } catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new TradeResponseMessageDTO(tradeId, "ERRO", e.getMessage()));
+        } catch (SecurityException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new TradeResponseMessageDTO(tradeId, "ERRO", e.getMessage()));
         } catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TradeResponseMessageDTO(tradeId, "ERRO", e.getMessage()));
         }
     }
 }

@@ -42,7 +42,7 @@ public class NotificationService {
                 )).collect(Collectors.toList());
     }
 
-    public void NotificateTradeToUser(User sender, User receiver, Book userBook, Book tradeBook, Long tradeId) {
+    public void notifyTradeToUser(User sender, User receiver, Book userBook, Book tradeBook, Long tradeId) {
         String message = sender.getName() + " propôs uma troca do seu livro '" + tradeBook.getTitle() +
                 "' por '" + userBook.getTitle() + "'. Você aceita? (ID da troca: " + tradeId + ")";
 

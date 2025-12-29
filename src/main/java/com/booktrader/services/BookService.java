@@ -3,6 +3,7 @@ package com.booktrader.services;
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.review.Review;
 import com.booktrader.domain.user.User;
+import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestBookDTO;
 import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
@@ -34,12 +35,7 @@ public class BookService {
 
         return this.repository.findAll()
                 .stream()
-                .map(book -> new ResponseBookDTO(
-                        book.getId(),
-                        book.getTitle(),
-                        book.getAuthor(),
-                        book.getImage()
-                ))
+                .map(ResponseBookDTO::from)
                 .collect(Collectors.toList());
     }
 
@@ -57,10 +53,10 @@ public class BookService {
         this.userService.saveUser(owner);
         this.saveBook(newBook);
 
-        return new ResponseBookDTO(newBook.getId(), newBook.getTitle(), newBook.getAuthor(), newBook.getImage());
+        return ResponseBookDTO.from(newBook);
     }
 
-    public Book updateBook(Long bookId, RequestBookDTO book) {
+    public ResponseBookDTO updateBook(Long bookId, RequestBookDTO book) {
         Book foundBook = findBookById(bookId);
         User owner = foundBook.getOwner();
 
@@ -74,11 +70,13 @@ public class BookService {
         this.repository.save(foundBook);
         this.userService.saveUser(owner);
 
-        return foundBook;
+        return ResponseBookDTO.from(foundBook);
     }
 
-    public void deleteBook(Long id){
+    public SuccessMessageDTO deleteBook(Long id){
         this.repository.deleteById(id);
+
+        return new SuccessMessageDTO("Livro excluido com sucesso!", "200");
     }
 
     public List<ResponseReviewDTO> getBookReviews(Long id) {
@@ -86,14 +84,8 @@ public class BookService {
 
         return book.getReviews()
                 .stream()
-                .map(review -> new ResponseReviewDTO(
-                        review.getId(),
-                        new UserBasicDTO(review.getWriter().getId(), review.getWriter().getName(), review.getWriter().getEmail()),
-                        new ResponseBookDTO(review.getReviewedBook().getId(), review.getReviewedBook().getTitle(), review.getReviewedBook().getAuthor(), review.getReviewedBook().getImage()),
-                        review.getReview(),
-                        review.getCriticNote(),
-                        review.getCreatedAt()
-                )).collect(Collectors.toList());
+                .map(ResponseReviewDTO::from)
+                .collect(Collectors.toList());
     }
 
     public UserBasicDTO getUserInfo(Long user_id){

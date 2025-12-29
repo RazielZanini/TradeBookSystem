@@ -11,6 +11,7 @@ import com.booktrader.dtos.response.ResponseTradeDTO;
 import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.infra.exceptions.ControllerExceptionHandler;
 import com.booktrader.repositories.TradeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,9 @@ public class TradeService {
     @Autowired
     private NotificationService notificationService;
 
-    public Trade findTradeById(Long id) throws Exception{
-        return this.tradeRepository.findTradeById(id)
-                .orElseThrow(() -> new Exception("Troca não encontrada"));
+    public Trade findTradeById(Long id){
+        return this.tradeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Troca não encontrada: " + id));
     }
 
     public List<Trade> findAllTrades(){
@@ -48,71 +49,82 @@ public class TradeService {
 
         User sender = this.userService.findUserById(trade.sender());
         User receiver = this.userService.findUserById(trade.receiver());
-        Book receiverBook = this.bookService.findBookById(trade.receiverBook());
         Book senderBook = this.bookService.findBookById(trade.senderBook());
+        Book receiverBook = this.bookService.findBookById(trade.receiverBook());
 
         validateTrade(sender, receiver, senderBook, receiverBook);
 
-        // Cria a troca com status "PENDING"
-        Trade newTrade = Trade.builder()
-                .senderBook(senderBook)
-                .receiverBook(receiverBook)
-                .receiver(receiver)
-                .sender(sender)
-                .status(TradeStatus.PENDING)
-                .build();
-
-        this.tradeRepository.save(newTrade);
-
-        notificationService.NotificateTradeToUser(sender, receiver, receiverBook, senderBook, newTrade.getId());
-
-        return new ResponseTradeDTO(
-                new UserBasicDTO(sender.getId(), sender.getName(), sender.getEmail()),
-                new UserBasicDTO(receiver.getId(), receiver.getName(), receiver.getEmail()),
-                new ResponseBookDTO(senderBook.getId(), senderBook.getTitle(), senderBook.getAuthor(), senderBook.getImage()),
-                new ResponseBookDTO(receiverBook.getId(), receiverBook.getTitle(), receiverBook.getAuthor(), receiverBook.getImage())
+        Trade newTrade = tradeRepository.save(
+                Trade.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .senderBook(senderBook)
+                        .receiverBook(receiverBook)
+                        .status(TradeStatus.PENDING)
+                        .build()
         );
+
+        notificationService.notifyTradeToUser(
+                sender,
+                receiver,
+                senderBook,
+                receiverBook,
+                newTrade.getId()
+        );
+
+        return ResponseTradeDTO.from(newTrade);
     }
 
     @Transactional
-    public void respondToTrade(Long tradeId, boolean accept) throws Exception {
+    public void respondToTrade(Long tradeId, boolean accept, Long loggedUserId) throws Exception {
 
         Trade trade = this.findTradeById(tradeId);
 
-        if (!trade.getStatus().equals(TradeStatus.PENDING)) {
-            throw new IllegalStateException("A troca já foi processada.");
+        if(!trade.getStatus().equals(TradeStatus.PENDING)){
+            throw new IllegalStateException("A troca ja foi processada!");
         }
 
-        if (accept) {
-            User sender = trade.getSender();
-            User receiver = trade.getReceiver();
-            Book senderBook = trade.getSenderBook();
-            Book receiverBook = trade.getReceiverBook();
+        if(!checkUserIsReceiver(trade.getReceiver().getId(), loggedUserId)){
+            throw new SecurityException("Este usuário não está autorizado a responder esta troca.");
+        }
 
-            // Troca de livros entre usuários
-            sender.getBooks().remove(senderBook);
-            receiver.getBooks().remove(receiverBook);
-            sender.getBooks().add(receiverBook);
-            receiver.getBooks().add(senderBook);
-
-            // Atualiza os donos dos livros
-            senderBook.setOwner(receiver);
-            receiverBook.setOwner(sender);
-
-            // Persiste as alterações
-            userService.saveUser(sender);
-            userService.saveUser(receiver);
-            bookService.saveBook(senderBook);
-            bookService.saveBook(receiverBook);
-
-            trade.setStatus(TradeStatus.COMPLETED);
-            // notificateUser(...) — opcional
+        if(accept){
+            trade.setStatus(TradeStatus.ACCEPTED);
+            processAcceptTrade(trade);
         } else {
             trade.setStatus(TradeStatus.REJECTED);
-            // notificateUser(...) — opcional
         }
 
         tradeRepository.save(trade);
+    }
+
+    public boolean checkUserIsReceiver(Long receiverId, Long userId){
+        return receiverId.equals(userId);
+    }
+
+    private void processAcceptTrade(Trade trade){
+        User sender = trade.getSender();
+        User receiver = trade.getReceiver();
+        Book senderBook = trade.getSenderBook();
+        Book receiverBook = trade.getReceiverBook();
+
+        // Troca de livros entre usuários
+        sender.getBooks().remove(senderBook);
+        receiver.getBooks().remove(receiverBook);
+        sender.getBooks().add(receiverBook);
+        receiver.getBooks().add(senderBook);
+
+        // Atualiza donos
+        senderBook.setOwner(receiver);
+        receiverBook.setOwner(sender);
+
+        // Persiste mudanças
+        userService.saveUser(sender);
+        userService.saveUser(receiver);
+        bookService.saveBook(senderBook);
+        bookService.saveBook(receiverBook);
+
+        trade.setStatus(TradeStatus.COMPLETED);
     }
 
 
