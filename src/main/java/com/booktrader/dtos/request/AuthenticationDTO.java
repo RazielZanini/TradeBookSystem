@@ -1,4 +1,7 @@
 package com.booktrader.dtos.request;
 
-public record AuthenticationDTO(String email, String password) {
+import jakarta.validation.constraints.NotEmpty;
+
+public record AuthenticationDTO(@NotEmpty(message = "Email é obrigatório") String email,
+                                @NotEmpty(message = "Senha é obrigatória") String password) {
 }

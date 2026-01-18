@@ -8,6 +8,7 @@ import com.booktrader.infra.security.TokenService;
 import com.booktrader.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,6 +53,6 @@ public class AuthenticationController {
 
         this.userRepository.save(newUser);
 
-        return ResponseEntity.ok("Usuário criado com sucesso!");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso!");
     }
 }

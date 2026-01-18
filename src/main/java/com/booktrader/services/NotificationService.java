@@ -22,13 +22,13 @@ public class NotificationService {
 
     @Transactional
     public List<ResponseNotificationDTO> getUnreadNotifications(Long userId){
-        List<Notification> notifications = this.notificationRepository.findByUserIdAndReadFalse(userId);
+        List<Notification> notifications = this.notificationRepository.findByUserIdAndReadStatusFalse(userId);
 
         if (notifications.isEmpty()) {
             return List.of();
         }
 
-        notifications.forEach(n -> n.setRead(true));
+        notifications.forEach(n -> n.setReadStatus(true));
         this.notificationRepository.saveAll(notifications);
 
         return notifications.stream()

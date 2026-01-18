@@ -2,7 +2,6 @@ package com.booktrader.domain.notification;
 
 import com.booktrader.domain.book.Book;
 import com.booktrader.domain.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,7 +37,7 @@ public class Notification {
 
     private LocalDateTime createdAt;
 
-    private boolean read;
+    private boolean readStatus;
 
     @PrePersist
     protected void onCreate(){
@@ -48,7 +47,7 @@ public class Notification {
     public Notification(String message, Book userBook, Book tradeBook, User user, Long tradeId){
         this.tradeBook = tradeBook;
         this.message = message;
-        this.read = false;
+        this.readStatus = false;
         this.userBook = userBook;
         this.user = user;
         this.tradeId = tradeId;
@@ -57,7 +56,7 @@ public class Notification {
     public Notification(String message, Book userBook, Book tradeBook, User user){
         this.tradeBook = tradeBook;
         this.message = message;
-        this.read = false;
+        this.readStatus = false;
         this.userBook = userBook;
         this.user = user;
         this.tradeId = null;
