@@ -2,7 +2,7 @@ package com.booktrader.controllers;
 
 import com.booktrader.domain.user.User;
 import com.booktrader.dtos.request.AuthenticationDTO;
-import com.booktrader.dtos.LoginResponseDTO;
+import com.booktrader.dtos.response.LoginResponseDTO;
 import com.booktrader.dtos.request.UserRequestDTO;
 import com.booktrader.infra.security.TokenService;
 import com.booktrader.repositories.UserRepository;
@@ -39,7 +39,7 @@ public class AuthenticationController {
 
             var token = tokenService.generateToken((User) auth.getPrincipal());
 
-            return ResponseEntity.ok(new LoginResponseDTO(token, "Login efetuado com sucesso!"));
+            return ResponseEntity.ok(new LoginResponseDTO(token));
         } catch (EntityNotFoundException error){
             return ResponseEntity.notFound().build();
         }
