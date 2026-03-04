@@ -16,8 +16,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {
-    @Autowired
-    private ReviewService reviewService;
+
+    private final ReviewService reviewService;
+
+    public ReviewController(ReviewService _reviewService){
+        this.reviewService = _reviewService;
+    }
 
     @GetMapping("/{reviewId}")
     public ResponseEntity<ResponseReviewDTO> getReview(@PathVariable("reviewId") Long reviewId) throws Exception{

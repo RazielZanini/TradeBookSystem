@@ -17,8 +17,11 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService _userService){
+        this.userService = _userService;
+    }
 
     @GetMapping
     public ResponseEntity<List<UserBasicDTO>> getAllUsers(){

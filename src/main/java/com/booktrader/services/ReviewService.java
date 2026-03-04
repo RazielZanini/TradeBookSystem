@@ -17,12 +17,21 @@ import java.util.stream.Collectors;
 @Service
 public class ReviewService {
 
-    @Autowired
-    private ReviewRepository repository;
-    @Autowired
-    private BookService bookService;
-    @Autowired
-    private  UserService userService;
+    private final ReviewRepository repository;
+
+    private final BookService bookService;
+
+    private final UserService userService;
+
+    public ReviewService(
+            ReviewRepository _repository,
+            BookService _bookService,
+            UserService _userService
+    ){
+        this.repository = _repository;
+        this.bookService = _bookService;
+        this.userService = _userService;
+    }
 
     public void saveReview(Review review){
         this.repository.save(review);

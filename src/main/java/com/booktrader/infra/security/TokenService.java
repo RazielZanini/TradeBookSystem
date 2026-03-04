@@ -6,11 +6,12 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.booktrader.domain.user.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TokenService {
@@ -19,11 +20,17 @@ public class TokenService {
 
     public String generateToken(User user){
 
+        List<String> roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                    .withIssuer("auth-api")
+                    .withIssuer("trade-book")
+                    .withIssuedAt(creationDate())
                     .withSubject(user.getEmail())
+                    .withClaim("roles", roles)
                     .withExpiresAt(generateExpirationDate())
                     .sign(algorithm);
 
@@ -36,7 +43,7 @@ public class TokenService {
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("auth-api")
+                    .withIssuer("trade-book")
                     .build()
                     .verify(token)
                     .getSubject();
@@ -45,7 +52,21 @@ public class TokenService {
         }
     }
 
+    public List<String> getRolesFromToken(String token){
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.require(algorithm)
+                .withIssuer("trade-book")
+                .build()
+                .verify(token)
+                .getClaim("roles")
+                .asList(String.class);
+    }
+
     private Instant generateExpirationDate(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
+    }
+
+    private Instant creationDate(){
+        return LocalDateTime.now().toInstant(ZoneOffset.of("-03:00"));
     }
 }

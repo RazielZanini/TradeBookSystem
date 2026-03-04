@@ -15,8 +15,11 @@ import java.util.stream.Collectors;
 @Service
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
+
+    public NotificationService(NotificationRepository _repository){
+        this.notificationRepository = _repository;
+    }
 
     public void saveNotification(Notification notification) { this.notificationRepository.save(notification); }
 

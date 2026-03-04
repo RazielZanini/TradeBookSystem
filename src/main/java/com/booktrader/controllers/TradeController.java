@@ -19,8 +19,11 @@ import java.util.List;
 @RequestMapping("/trades")
 public class TradeController {
 
-    @Autowired
-    private TradeService tradeService;
+    private final TradeService tradeService;
+
+    public TradeController(TradeService _tradeService){
+        this.tradeService = _tradeService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Trade>> getAllTrades() {

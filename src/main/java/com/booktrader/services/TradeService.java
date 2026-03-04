@@ -18,17 +18,25 @@ import java.util.Objects;
 @Service
 public class TradeService {
 
-    @Autowired
-    private TradeRepository tradeRepository;
+    private final TradeRepository tradeRepository;
 
-    @Autowired
-    private BookService bookService;
+    private final BookService bookService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
+
+    public TradeService(
+            TradeRepository tradeRepository,
+            BookService bookService,
+            UserService userService,
+            NotificationService notificationService
+    ){
+        this.tradeRepository = tradeRepository;
+        this.bookService = bookService;
+        this.userService = userService;
+        this.notificationService = notificationService;
+    }
 
     public Trade findTradeById(Long id){
         return this.tradeRepository.findById(id)

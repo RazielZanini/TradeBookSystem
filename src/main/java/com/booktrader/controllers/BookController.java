@@ -1,5 +1,6 @@
 package com.booktrader.controllers;
 
+import com.booktrader.domain.book.Book;
 import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestBookDTO;
 import com.booktrader.dtos.response.ResponseBookDTO;
@@ -16,8 +17,18 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    @Autowired
-    private BookService bookService;
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
+
+    @GetMapping("/{bookId}")
+    public ResponseEntity<ResponseBookDTO> getBook(@PathVariable Long bookId){
+        Book book = bookService.findBookById(bookId);
+        ResponseBookDTO response = ResponseBookDTO.from(book);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PostMapping
     public ResponseEntity<ResponseBookDTO> createBook(@RequestBody RequestBookDTO book){

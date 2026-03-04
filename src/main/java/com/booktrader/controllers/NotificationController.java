@@ -20,6 +20,10 @@ public class NotificationController {
     @Autowired
     NotificationService notificationService;
 
+    public NotificationController(NotificationService _notificationService){
+        this.notificationService = _notificationService;
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<List<ResponseNotificationDTO>> getUnreadNotifications(@PathVariable Long userId) throws Exception {
         List<ResponseNotificationDTO> notifications = this.notificationService.getUnreadNotifications(userId);

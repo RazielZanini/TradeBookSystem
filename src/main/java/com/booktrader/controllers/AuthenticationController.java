@@ -6,7 +6,13 @@ import com.booktrader.dtos.response.LoginResponseDTO;
 import com.booktrader.dtos.request.UserRequestDTO;
 import com.booktrader.infra.security.TokenService;
 import com.booktrader.repositories.UserRepository;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.coyote.Response;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +28,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 @RequestMapping("/auth")
 public class AuthenticationController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final UserRepository userRepository;
+
+    private final TokenService tokenService;
+
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthenticationController(
+            AuthenticationManager _authenticationManager,
+            UserRepository _userRepository,
+            TokenService _tokenService,
+            BCryptPasswordEncoder _passwordEncoder
+    ){
+        this.authenticationManager = _authenticationManager;
+        this.userRepository = _userRepository;
+        this.tokenService = _tokenService;
+        this.passwordEncoder = _passwordEncoder;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Validated AuthenticationDTO data){
@@ -54,5 +72,10 @@ public class AuthenticationController {
         this.userRepository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso!");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(){
+        return ResponseEntity.ok("Logout realizado no cliente");
     }
 }

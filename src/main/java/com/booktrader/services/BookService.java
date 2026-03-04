@@ -6,10 +6,7 @@ import com.booktrader.dtos.SuccessMessageDTO;
 import com.booktrader.dtos.request.RequestBookDTO;
 import com.booktrader.dtos.response.ResponseBookDTO;
 import com.booktrader.dtos.response.ResponseReviewDTO;
-import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +15,14 @@ import java.util.stream.Collectors;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository repository;
-    @Autowired
-    @Lazy
-    private UserService userService;
+    private final BookRepository repository;
+
+    private final UserService userService;
+
+    public BookService(BookRepository bookRepository, UserService userService){
+        this.userService = userService;
+        this.repository = bookRepository;
+    }
 
     public Book findBookById(Long id) throws IllegalArgumentException{
         return this.repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Livro não encontrado"));
@@ -54,20 +54,21 @@ public class BookService {
     }
 
     public ResponseBookDTO updateBook(Long bookId, RequestBookDTO book) {
+
         Book foundBook = findBookById(bookId);
         User owner = foundBook.getOwner();
 
-        owner.getBooks().remove(foundBook);
-        foundBook.setTitle(book.title());
-        foundBook.setAuthor(book.author());
-        foundBook.setEdition(book.edition());
-        foundBook.setConservStatus(book.conservStatus());
+            owner.getBooks().remove(foundBook);
+            foundBook.setTitle(book.title());
+            foundBook.setAuthor(book.author());
+            foundBook.setEdition(book.edition());
+            foundBook.setConservStatus(book.conservStatus());
 
-        owner.getBooks().add(foundBook);
-        this.repository.save(foundBook);
-        this.userService.saveUser(owner);
+            owner.getBooks().add(foundBook);
+            this.repository.save(foundBook);
+            this.userService.saveUser(owner);
 
-        return ResponseBookDTO.from(foundBook);
+            return ResponseBookDTO.from(foundBook);
     }
 
     public SuccessMessageDTO deleteBook(Long id){
@@ -83,10 +84,5 @@ public class BookService {
                 .stream()
                 .map(ResponseReviewDTO::from)
                 .collect(Collectors.toList());
-    }
-
-    public UserBasicDTO getUserInfo(Long user_id){
-        User user = userService.findUserById(user_id);
-        return new UserBasicDTO(user.getId(), user.getName(), user.getEmail());
     }
 }

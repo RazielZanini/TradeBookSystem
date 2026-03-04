@@ -7,6 +7,8 @@ import com.booktrader.dtos.request.UserRequestDTO;
 import com.booktrader.dtos.response.UserBasicDTO;
 import com.booktrader.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +19,11 @@ import static org.springframework.util.Assert.notNull;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository repository;
-    @Autowired
-    private BookService bookService;
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository){
+        this.repository = repository;
+    }
 
     public void saveUser(User user){
         this.repository.save(user);
